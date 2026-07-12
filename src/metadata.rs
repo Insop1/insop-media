@@ -1,5 +1,5 @@
-use serde_json::json;
 use crate::config::Config;
+use serde_json::json;
 
 pub struct Metadata<'a> {
     player: &'a str,
@@ -13,14 +13,24 @@ pub struct Metadata<'a> {
 
 impl<'a> Metadata<'a> {
     pub fn new(
-        player: &'a str, 
+        player: &'a str,
         status: &'a str,
-        artist: &'a str, 
-        title: &'a str, 
+        artist: &'a str,
+        title: &'a str,
         album: &'a str,
-        art_url: &'a str, 
+        art_url: &'a str,
         config: &'a Config,
-    ) -> Self { Self { player, status, artist, title, album, art_url, config } }
+    ) -> Self {
+        Self {
+            player,
+            status,
+            artist,
+            title,
+            album,
+            art_url,
+            config,
+        }
+    }
 
     fn lookup(&self, key: &str) -> Option<&str> {
         match key {
@@ -34,9 +44,7 @@ impl<'a> Metadata<'a> {
     }
     fn text(&self) -> String {
         let dynamic: &Vec<String> = &self.config.dynamic;
-        let temp: Vec<&str> = dynamic.iter()
-            .filter_map(|x| self.lookup(x))
-            .collect();
+        let temp: Vec<&str> = dynamic.iter().filter_map(|x| self.lookup(x)).collect();
 
         temp.join(" - ")
     }
@@ -48,8 +56,8 @@ impl<'a> Metadata<'a> {
         // the glyph will be configurable eventually
         let text = match self.status {
             "Playing" => format!("{} {}", "󰏤", self.text()),
-            "Paused" => format!("{} <i>{}</i>", "󰐊",self.text()),
-            _ => String::new()
+            "Paused" => format!("{} <i>{}</i>", "󰐊", self.text()),
+            _ => String::new(),
         };
 
         let output = json!({
@@ -63,13 +71,9 @@ impl<'a> Metadata<'a> {
     }
     #[allow(unused)]
     pub fn string(&self) -> String {
-        format!("{}\n{}\n{}\n{}\n{}\n{}\n", 
-            self.player, 
-            self.status, 
-            self.artist, 
-            self.title, 
-            self.album, 
-            self.art_url
+        format!(
+            "{}\n{}\n{}\n{}\n{}\n{}\n",
+            self.player, self.status, self.artist, self.title, self.album, self.art_url
         )
     }
 }
