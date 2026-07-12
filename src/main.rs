@@ -19,7 +19,10 @@ enum Commands {
     Run,
     Toggle,
     Next,
-    Previous
+    Previous,
+    Volume {
+        change: String
+    }
 }
 
 fn main() {
@@ -41,5 +44,6 @@ fn main() {
         Commands::Toggle => control::toggle(&config),
         Commands::Next => control::next(&config),
         Commands::Previous => control::previous(&config),
+        Commands::Volume{ change } => control::volume(&config, &change),
     }
 }

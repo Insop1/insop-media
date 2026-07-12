@@ -5,24 +5,26 @@ use std::collections::HashMap;
 fn run_control(
     config: &Config, 
     subcommand: &str, 
-    value: Option<&str>, 
+    value: &str, 
     special_command: 
     &HashMap<String, String>
 ) {
     if let Some(player) = get_priority_player(config) {
         if let Some(cmd) = special_command.get(&player) {
-            let _ = Command::new("sh").args(["-c", &cmd]).status();
-            return
+            let cmd = match value {
+                "" => cmd,
+                _ => &format!("{} {}", cmd, value),
+            };
+            let args = vec!["-c", &cmd];
+            let _ = Command::new("sh").args(args).status();
         }
+        
+        let mut args = vec!["-p", &player, subcommand];
+        if !value.is_empty() {
+            args.push(value);
+        } 
+        let _ = Command::new("playerctl").args(&args).status();
     }
-
-    let players = config.players.join(",");
-    let mut args = vec!["-p", &players, subcommand];
-    if let Some(v) = value {
-        args.push(v);
-    } 
-    
-    let _ = Command::new("playerctl").args(&args).status();
 }
 
 fn get_priority_player(config: &Config) -> Option<String> {
@@ -43,12 +45,15 @@ fn get_priority_player(config: &Config) -> Option<String> {
         .cloned()
 }
 
+pub fn volume(config: &Config, change: &str) {
+    run_control(config, "volume", change, &config.special_commands.volume);
+}
 pub fn toggle(config: &Config) {
-    run_control(config, "play-pause", None, &config.special_commands.play_pause);
+    run_control(config, "play-pause", "", &config.special_commands.play_pause);
 }
 pub fn next(config: &Config) {
-    run_control(config, "next", None, &config.special_commands.next);
+    run_control(config, "next", "", &config.special_commands.next);
 }
 pub fn previous(config: &Config) {
-    run_control(config, "previous", None,  &config.special_commands.previous);
+    run_control(config, "previous", "",  &config.special_commands.previous);
 }

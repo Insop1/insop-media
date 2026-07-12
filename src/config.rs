@@ -22,6 +22,8 @@ pub struct SpecialCommands {
     pub next: HashMap<String, String>,
     #[serde(default)]
     pub previous: HashMap<String, String>,
+    #[serde(default)]
+    pub volume: HashMap<String, String>,
 }
 
 pub fn load_config(path: &Path) -> Option<Config> {
